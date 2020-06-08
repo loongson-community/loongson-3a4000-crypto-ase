@@ -391,7 +391,7 @@ OPCODE       WT    WS    WD    MINOR_OP
 011110 11011 xxxxx xxxxx xxxxx 010111
 ```
 
-Format: `sha256.ms.1 wd, ws, wt`
+Format: `sha256.ms.2 wd, ws, wt`
 
 Purpose: SHA-256 Message Schedule, Second Half
 
