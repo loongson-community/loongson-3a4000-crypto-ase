@@ -39,6 +39,10 @@ The Codescape SDK has full sources available, though.
 |[`sha256.hash.2r`](#sha256hash2r)|SHA-256 Hash, 2 Rounds|
 |[`sha256.ms.1`](#sha256ms1)|SHA-256 Message Schedule, First Half|
 |[`sha256.ms.2`](#sha256ms2)|SHA-256 Message Schedule, Second Half|
+|[`sha512.hash.r.1`](#sha512hashr1)|SHA-512 Hash, 1 Round, First Half|
+|[`sha512.hash.r.2`](#sha512hashr2)|SHA-512 Hash, 1 Round, Second Half|
+|[`sha512.ms.1`](#sha512ms1)|SHA-512 Message Schedule, First Half|
+|[`sha512.ms.2`](#sha512ms2)|SHA-512 Message Schedule, Second Half|
 
 There are some other crypto-related instructions present in the Codescape SDK binutils.
 Behavior of these instructions are not fully known yet.
@@ -422,6 +426,86 @@ WR[wd]_31..0   <- z0
 WR[wd]_63..32  <- z1
 WR[wd]_95..64  <- z2
 WR[wd]_127..96 <- z3
+```
+
+### `sha512.hash.1`
+
+```
+OPCODE       WT    WS    WD    MINOR_OP
+011110 10100 xxxxx xxxxx xxxxx 010111
+```
+
+Format: `sha512.hash.1 wd, ws, wt`
+
+Purpose: SHA-512 Hash, 1 Round, First Half
+
+Operation:
+
+```
+S0 <- lambda a: (a ror 28) xor (a ror 34) xor (a ror 39)
+S1 <- lambda e: (e ror 14) xor (e ror 18) xor (e ror 41)
+ch <- lambda e, f, g: (e and f) xor ((not e) and g)
+maj <- lambda a, b, c: (a and b) xor (a and c) xor (b and c)
+
+WR[wd]_63..0   <- S0(WR[wd]_63..0)   + maj(WR[wd]_63..0,   WR[ws]_63..0,   WR[wt]_63..0)
+WR[wd]_127..64 <- S1(WR[wd]_127..64) +  ch(WR[wd]_127..64, WR[ws]_127..64, WR[wt]_127..64)
+```
+
+### `sha512.hash.2`
+
+```
+OPCODE       WT    WS    WD    MINOR_OP
+011110 10101 xxxxx xxxxx xxxxx 010111
+```
+
+Format: `sha512.hash.2 wd, ws, wt`
+
+Purpose: SHA-512 Hash, 1 Round, Second Half
+
+Operation:
+
+```
+WR[wd]_63..0   <- WR[wd]_63..0   + WR[wd]_127..64 + WR[ws]_127..64 + WR[wt]_63..0
+WR[wd]_127..64 <- WR[wd]_127..64 + WR[ws]_63..0   + WR[ws]_127..64 + WR[wt]_63..0
+```
+
+### `sha512.ms.1`
+
+```
+OPCODE       WT    WS    WD    MINOR_OP
+011110 11100 xxxxx xxxxx xxxxx 010111
+```
+
+Format: `sha512.ms.1 wd, ws, wt`
+
+Purpose: SHA-512 Message Schedule, First Half
+
+Operation:
+
+```
+s0 <- lambda x: (x ror 1) xor (x ror 8) xor (x >> 7)
+s1 <- lambda x: (x ror 19) xor (x ror 61) xor (x >> 6)
+
+WR[wd]_63..0   <- WR[wd]_63..0   + s1(WR[wt]_63..0)   + s0(WR[wd]_127..64)
+WR[wd]_127..64 <- WR[wd]_127..64 + s1(WR[wt]_127..64) + s0(WR[ws]_63..0)
+```
+
+### `sha512.ms.2`
+
+```
+OPCODE       WT    WS    WD    MINOR_OP
+011110 11101 xxxxx xxxxx xxxxx 010111
+```
+
+Format: `sha512.ms.2 wd, ws, wt`
+
+Purpose: SHA-512 Message Schedule, Second Half
+
+Operation:
+
+```
+WR[wd]_63..0   <- WR[wd]_63..0   + WR[ws]_127..64
+WR[wd]_127..64 <- WR[wd]_127..64 + WR[wt]_63..0
 ```
 
 ## License
