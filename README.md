@@ -9,6 +9,10 @@ released despite repeated community requests.
 This repository serves to consolidate the community effort of 3A4000 crypto
 acceleration reverse-engineering.
 
+As the instructions are present in the MIPS SDK too, it is assumed that the
+crypto instructions actually belong to the upstream MSA specification,
+although undocumented so far.
+
 [3a4000]: http://www.loongson.cn/product/cpu/3/1288.html
 
 ## Source Materials
